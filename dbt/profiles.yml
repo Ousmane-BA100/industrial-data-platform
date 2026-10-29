@@ -1,0 +1,12 @@
+industrial_data_platform:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: "{{ env_var('DBT_POSTGRES_HOST', 'localhost') }}"
+      port: "{{ env_var('DBT_POSTGRES_PORT', '5432') | as_number }}"
+      user: "{{ env_var('DBT_POSTGRES_USER') }}"
+      pass: "{{ env_var('DBT_POSTGRES_PASSWORD') }}"
+      dbname: "{{ env_var('DBT_POSTGRES_DB') }}"
+      schema: public
+      threads: 4

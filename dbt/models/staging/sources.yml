@@ -1,0 +1,166 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: public
+    description: "Tables brutes chargees depuis les fichiers CSV simulant les systemes industriels."
+    tables:
+      - name: suppliers
+        description: "Referentiel des fournisseurs SAP/ERP."
+        columns:
+          - name: supplier_id
+            description: "Identifiant unique du fournisseur."
+          - name: name
+            description: "Raison sociale du fournisseur."
+          - name: country
+            description: "Code pays ISO du fournisseur."
+          - name: city
+            description: "Ville du fournisseur."
+          - name: contact_email
+            description: "Adresse electronique de contact."
+          - name: phone
+            description: "Numero de telephone de contact."
+          - name: active
+            description: "Indique si le fournisseur peut recevoir de nouvelles commandes."
+          - name: payment_terms
+            description: "Delai de paiement contractuel en jours."
+          - name: created_at
+            description: "Horodatage de creation de l'enregistrement dans la plateforme."
+
+      - name: materials
+        description: "Referentiel SAP/ERP des matieres et composants achetables."
+        columns:
+          - name: material_id
+            description: "Identifiant unique du materiau."
+          - name: description
+            description: "Designation fonctionnelle du materiau."
+          - name: category
+            description: "Famille de composant, par exemple CPU, MEMORY ou STORAGE."
+          - name: unit
+            description: "Unite de mesure du materiau."
+          - name: supplier_id
+            description: "Identifiant du fournisseur principal."
+          - name: unit_price
+            description: "Prix d'achat unitaire du materiau."
+          - name: lead_time_days
+            description: "Delai d'approvisionnement estime en jours."
+          - name: active
+            description: "Indique si le materiau est encore approvisionnable."
+
+      - name: products
+        description: "Referentiel PLM des produits finis fabriques."
+        columns:
+          - name: product_id
+            description: "Identifiant unique du produit fini."
+          - name: name
+            description: "Nom commercial ou industriel du produit."
+          - name: family
+            description: "Famille industrielle du produit."
+          - name: description
+            description: "Description fonctionnelle du produit."
+          - name: unit_price
+            description: "Prix de vente unitaire du produit fini."
+          - name: weight_kg
+            description: "Poids unitaire du produit en kilogrammes."
+          - name: active
+            description: "Indique si le produit est actuellement commercialise."
+
+      - name: bom
+        description: "Nomenclature PLM reliant chaque produit a ses composants et quantites."
+        columns:
+          - name: bom_id
+            description: "Identifiant unique de la ligne de nomenclature."
+          - name: product_id
+            description: "Produit fini auquel appartient le composant."
+          - name: component_id
+            description: "Identifiant du materiau constituant le produit."
+          - name: quantity
+            description: "Quantite de ce composant necessaire pour une unite du produit."
+          - name: unit
+            description: "Unite de mesure de la quantite de composant."
+          - name: lead_time_days
+            description: "Delai indicatif de disponibilite du composant."
+
+      - name: inventory
+        description: "Positions de stock SAP/ERP par materiau et entrepot. Peut contenir des anomalies negatives intentionnelles."
+        columns:
+          - name: inventory_id
+            description: "Identifiant unique de la position de stock."
+          - name: material_id
+            description: "Materiau stocke."
+          - name: warehouse
+            description: "Code de l'entrepot physique."
+          - name: quantity_on_hand
+            description: "Quantite physiquement presente."
+          - name: quantity_reserved
+            description: "Quantite reservee pour des besoins existants."
+          - name: quantity_available
+            description: "Quantite disponible declaree par le systeme source."
+          - name: last_movement
+            description: "Date du dernier mouvement de stock."
+          - name: reorder_level
+            description: "Seuil de stock declenchant un reapprovisionnement."
+
+      - name: orders
+        description: "Commandes d'achat SAP/ERP reliees aux fournisseurs et materiaux."
+        columns:
+          - name: order_id
+            description: "Identifiant unique de la commande d'achat."
+          - name: supplier_id
+            description: "Fournisseur destinataire de la commande."
+          - name: material_id
+            description: "Materiau commande."
+          - name: quantity
+            description: "Quantite commandee."
+          - name: unit
+            description: "Unite de mesure de la commande."
+          - name: order_date
+            description: "Date d'emission de la commande."
+          - name: delivery_date
+            description: "Date de livraison prevue."
+          - name: status
+            description: "Etat de traitement de la commande."
+          - name: unit_price
+            description: "Prix unitaire negocie pour la commande."
+          - name: total_amount
+            description: "Montant total de la commande."
+
+      - name: production_events
+        description: "Evenements de fabrication reliant produits finis, machines et quantites."
+        columns:
+          - name: production_event_id
+            description: "Identifiant unique du lot ou evenement de production."
+          - name: product_id
+            description: "Produit fabrique pendant l'evenement."
+          - name: machine_id
+            description: "Machine ou ligne de fabrication utilisee."
+          - name: quantity_produced
+            description: "Nombre d'unites fabriquees pendant l'evenement."
+          - name: event_timestamp
+            description: "Date et heure de l'evenement de production."
+          - name: shift
+            description: "Equipe ou quart de travail."
+          - name: operator_id
+            description: "Identifiant de l'operateur responsable."
+          - name: status
+            description: "Resultat de production : PASSED, FAILED ou REWORK."
+
+      - name: quality_inspections
+        description: "Resultats des controles qualite associes aux evenements de production."
+        columns:
+          - name: inspection_id
+            description: "Identifiant unique du controle qualite."
+          - name: production_event_id
+            description: "Evenement de production controle."
+          - name: inspection_date
+            description: "Date de realisation du controle."
+          - name: inspector_id
+            description: "Identifiant de l'inspecteur."
+          - name: test_type
+            description: "Nature du controle : visuel, dimensionnel, electrique ou fonctionnel."
+          - name: defect_code
+            description: "Code du defaut observe, ou NO_DEFECT en l'absence de defaut."
+          - name: status
+            description: "Resultat du controle : PASSED ou FAILED."
+          - name: comments
+            description: "Commentaire libre associe a l'inspection."

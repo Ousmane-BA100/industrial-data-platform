@@ -1,0 +1,208 @@
+version: 2
+
+models:
+  - name: dim_products
+    description: "Dimension analytique des produits finis, derivee du referentiel PLM."
+    columns:
+      - name: product_id
+        description: "Cle du produit fini."
+      - name: name
+        description: "Nom du produit."
+      - name: family
+        description: "Famille industrielle du produit."
+      - name: description
+        description: "Description fonctionnelle du produit."
+      - name: unit_price
+        description: "Prix de vente unitaire."
+      - name: weight_kg
+        description: "Poids unitaire en kilogrammes."
+      - name: active
+        description: "Indique si le produit est commercialise."
+
+  - name: dim_materials
+    description: "Dimension analytique des composants et matieres approvisionnes."
+    columns:
+      - name: material_id
+        description: "Cle du materiau."
+      - name: description
+        description: "Designation du materiau."
+      - name: category
+        description: "Categorie industrielle du materiau."
+      - name: unit
+        description: "Unite de mesure."
+      - name: supplier_id
+        description: "Fournisseur principal."
+      - name: unit_price
+        description: "Prix d'achat unitaire."
+      - name: lead_time_days
+        description: "Delai d'approvisionnement estime en jours."
+      - name: active
+        description: "Indique si le materiau est encore approvisionnable."
+
+  - name: dim_suppliers
+    description: "Dimension analytique des fournisseurs."
+    columns:
+      - name: supplier_id
+        description: "Cle du fournisseur."
+      - name: name
+        description: "Raison sociale."
+      - name: country
+        description: "Code pays ISO."
+      - name: city
+        description: "Ville du fournisseur."
+      - name: active
+        description: "Indique si le fournisseur est actif."
+      - name: payment_terms
+        description: "Delai de paiement contractuel en jours."
+
+  - name: dim_product_components
+    description: "Nomenclature enrichie destinee a l'analyse detaillee des composants par produit."
+    columns:
+      - name: product_id
+        description: "Cle du produit fini."
+      - name: product_name
+        description: "Nom du produit fini."
+      - name: product_family
+        description: "Famille du produit fini."
+      - name: component_id
+        description: "Cle du composant."
+      - name: component_description
+        description: "Designation du composant."
+      - name: component_category
+        description: "Categorie du composant."
+      - name: quantity
+        description: "Quantite requise pour une unite de produit."
+      - name: unit
+        description: "Unite de mesure de la quantite."
+      - name: component_unit_price
+        description: "Prix d'achat unitaire du composant."
+      - name: component_total_cost
+        description: "Cout du composant dans une unite de produit."
+
+  - name: fact_product_bom_cost
+    description: "{{ doc('product_bom_cost_overview') }}"
+    columns:
+      - name: product_id
+        description: "Cle du produit fini."
+      - name: product_name
+        description: "Nom du produit fini."
+      - name: product_family
+        description: "Famille du produit fini."
+      - name: nb_components
+        description: "Nombre de references composants distinctes dans la nomenclature."
+      - name: total_components_qty
+        description: "Somme des quantites de composants de la nomenclature."
+      - name: total_bom_cost
+        description: "Cout theorique total des composants pour une unite du produit."
+
+  - name: fact_production
+    description: "Table de faits avec une ligne par evenement de fabrication."
+    columns:
+      - name: production_event_id
+        description: "Cle de l'evenement de production."
+      - name: product_id
+        description: "Produit fabrique."
+      - name: machine_id
+        description: "Machine ou ligne de fabrication."
+      - name: quantity_produced
+        description: "Quantite fabriquee pendant l'evenement."
+      - name: event_timestamp
+        description: "Date et heure de fabrication."
+      - name: production_status
+        description: "Resultat de production : PASSED, FAILED ou REWORK."
+
+  - name: fact_quality
+    description: "Table de faits avec une ligne par inspection qualite existante."
+    columns:
+      - name: inspection_id
+        description: "Cle de l'inspection qualite."
+      - name: production_event_id
+        description: "Evenement de production inspecte."
+      - name: product_id
+        description: "Produit inspecte."
+      - name: inspection_date
+        description: "Date du controle."
+      - name: test_type
+        description: "Type du controle realise."
+      - name: defect_code
+        description: "Defaut observe ou NO_DEFECT."
+      - name: quality_status
+        description: "Resultat du controle : PASSED ou FAILED."
+      - name: production_status
+        description: "Resultat de production associe."
+
+  - name: fact_inventory_status
+    description: "{{ doc('inventory_anomaly_policy') }}"
+    columns:
+      - name: inventory_id
+        description: "Cle de la position de stock."
+      - name: material_id
+        description: "Materiau stocke."
+      - name: material_description
+        description: "Designation du materiau."
+      - name: material_category
+        description: "Categorie du materiau."
+      - name: warehouse
+        description: "Entrepot de stockage."
+      - name: quantity_on_hand
+        description: "Quantite physiquement presente."
+      - name: quantity_reserved
+        description: "Quantite reservee."
+      - name: quantity_available
+        description: "Quantite disponible pour utilisation."
+      - name: reorder_level
+        description: "Seuil de reapprovisionnement."
+      - name: last_movement
+        description: "Date du dernier mouvement connu."
+      - name: is_below_reorder_level
+        description: "Vrai si la quantite disponible est inferieure ou egale au seuil."
+
+  - name: kpi_inventory_replenishment
+    description: "Indicateurs agreges de stock par materiau pour piloter les besoins de reapprovisionnement."
+    columns:
+      - name: material_id
+        description: "Cle du materiau."
+      - name: material_description
+        description: "Designation du materiau."
+      - name: material_category
+        description: "Categorie du materiau."
+      - name: warehouse_count
+        description: "Nombre d'entrepots contenant le materiau."
+      - name: total_available_quantity
+        description: "Stock disponible cumule sur les entrepots."
+      - name: total_reorder_level
+        description: "Somme des seuils de reapprovisionnement par entrepot."
+      - name: warehouses_below_reorder_level
+        description: "Nombre d'entrepots sous leur seuil de reapprovisionnement."
+      - name: needs_replenishment
+        description: "Vrai si le stock disponible cumule est inferieur ou egal au seuil cumule."
+
+  - name: kpi_quality_by_product_machine
+    description: "Taux de conformite et volumes de production/inspection par produit et machine."
+    columns:
+      - name: product_id
+        description: "Produit fabrique et inspecte."
+      - name: machine_id
+        description: "Machine ou ligne de fabrication."
+      - name: production_events
+        description: "Nombre d'evenements de production distincts."
+      - name: quantity_produced
+        description: "Quantite totale produite."
+      - name: inspections
+        description: "Nombre d'inspections qualite."
+      - name: passed_inspections
+        description: "Nombre d'inspections conformes."
+      - name: failed_inspections
+        description: "Nombre d'inspections non conformes."
+      - name: conformity_rate_pct
+        description: "{{ doc('quality_conformity_rate') }}"
+
+  - name: kpi_top_defects
+    description: "Classement des defauts qualite observes, hors inspections sans defaut."
+    columns:
+      - name: defect_code
+        description: "Code du defaut observe."
+      - name: inspection_count
+        description: "Nombre d'inspections ayant detecte ce defaut."
+      - name: defect_rate_pct
+        description: "Part de ce defaut dans l'ensemble des defauts observes, en pourcentage."

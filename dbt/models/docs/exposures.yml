@@ -1,0 +1,44 @@
+version: 2
+
+exposures:
+  - name: industrial_fastapi
+    label: "API FastAPI - Industrial Data Platform"
+    type: application
+    maturity: medium
+    url: "http://localhost:8000/docs"
+    description: >-
+      API REST en lecture seule qui expose les marts produits, nomenclatures,
+      fournisseurs, stocks et indicateurs de qualite aux applications clientes.
+    depends_on:
+      - ref('dim_products')
+      - ref('dim_product_components')
+      - ref('fact_product_bom_cost')
+      - ref('dim_materials')
+      - ref('dim_suppliers')
+      - ref('fact_inventory_status')
+      - ref('kpi_inventory_replenishment')
+      - ref('kpi_quality_by_product_machine')
+      - ref('kpi_top_defects')
+    owner:
+      name: Data Engineering
+      email: data-engineering@example.invalid
+
+  - name: industrial_streamlit_dashboard
+    label: "Tableau de bord Streamlit - Industrial Data Platform"
+    type: application
+    maturity: medium
+    url: "http://localhost:8501"
+    description: >-
+      Tableau de bord metier de suivi de la production, de la qualite,
+      des stocks et des couts de nomenclature. Les donnees sont consommees
+      depuis l'API FastAPI, qui depend des marts dbt.
+    depends_on:
+      - ref('kpi_quality_by_product_machine')
+      - ref('kpi_top_defects')
+      - ref('fact_inventory_status')
+      - ref('kpi_inventory_replenishment')
+      - ref('fact_product_bom_cost')
+      - ref('dim_product_components')
+    owner:
+      name: Data Engineering
+      email: data-engineering@example.invalid

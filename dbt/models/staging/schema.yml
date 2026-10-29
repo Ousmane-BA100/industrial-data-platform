@@ -1,0 +1,204 @@
+version: 2
+
+models:
+  - name: stg_suppliers
+    description: "Couche staging du referentiel fournisseur SAP, exposee avec une structure proche de la source."
+    columns:
+      - name: supplier_id
+        description: "Identifiant unique du fournisseur."
+        tests: [not_null, unique]
+      - name: name
+        description: "Raison sociale du fournisseur."
+      - name: country
+        description: "Code pays ISO du fournisseur."
+      - name: city
+        description: "Ville du fournisseur."
+      - name: contact_email
+        description: "Adresse electronique de contact."
+      - name: phone
+        description: "Numero de telephone de contact."
+      - name: active
+        description: "Indique si le fournisseur peut recevoir de nouvelles commandes."
+      - name: payment_terms
+        description: "Delai de paiement contractuel en jours."
+      - name: created_at
+        description: "Horodatage de creation de l'enregistrement."
+
+  - name: stg_materials
+    description: "Couche staging des matieres et composants SAP/ERP."
+    columns:
+      - name: material_id
+        description: "Identifiant unique du materiau."
+        tests: [not_null, unique]
+      - name: supplier_id
+        description: "Identifiant du fournisseur principal du materiau."
+        tests:
+          - relationships:
+              to: ref('stg_suppliers')
+              field: supplier_id
+      - name: description
+        description: "Designation fonctionnelle du materiau."
+      - name: category
+        description: "Famille du materiau, par exemple CPU, MEMORY ou STORAGE."
+      - name: unit
+        description: "Unite de mesure du materiau."
+      - name: unit_price
+        description: "Prix d'achat unitaire du materiau."
+      - name: lead_time_days
+        description: "Delai d'approvisionnement estime en jours."
+      - name: active
+        description: "Indique si le materiau est encore approvisionnable."
+
+  - name: stg_products
+    description: "Couche staging du referentiel PLM des produits finis."
+    columns:
+      - name: product_id
+        description: "Identifiant unique du produit fini."
+        tests: [not_null, unique]
+      - name: name
+        description: "Nom commercial ou industriel du produit."
+      - name: family
+        description: "Famille industrielle du produit."
+      - name: description
+        description: "Description fonctionnelle du produit."
+      - name: unit_price
+        description: "Prix de vente unitaire du produit fini."
+      - name: weight_kg
+        description: "Poids unitaire en kilogrammes."
+      - name: active
+        description: "Indique si le produit est actuellement commercialise."
+
+  - name: stg_bom
+    description: "Couche staging de la nomenclature PLM produit-composant."
+    columns:
+      - name: bom_id
+        description: "Identifiant unique de la ligne de nomenclature."
+        tests: [not_null, unique]
+      - name: product_id
+        description: "Produit fini auquel appartient le composant."
+        tests:
+          - relationships:
+              to: ref('stg_products')
+              field: product_id
+      - name: component_id
+        description: "Identifiant du materiau composant."
+        tests:
+          - relationships:
+              to: ref('stg_materials')
+              field: material_id
+      - name: quantity
+        description: "Quantite requise pour fabriquer une unite du produit."
+      - name: unit
+        description: "Unite de mesure de la quantite de composant."
+      - name: lead_time_days
+        description: "Delai indicatif de disponibilite du composant."
+
+  - name: stg_inventory
+    description: "Couche staging du stock SAP par materiau et entrepot. Les anomalies negatives intentionnelles restent visibles pour les tests de qualite."
+    columns:
+      - name: inventory_id
+        description: "Identifiant unique de la position de stock."
+        tests: [not_null, unique]
+      - name: material_id
+        description: "Materiau stocke."
+        tests:
+          - relationships:
+              to: ref('stg_materials')
+              field: material_id
+      - name: warehouse
+        description: "Code de l'entrepot physique."
+      - name: quantity_on_hand
+        description: "Quantite physiquement presente."
+      - name: quantity_reserved
+        description: "Quantite reservee pour des besoins existants."
+      - name: quantity_available
+        description: "Quantite disponible declaree par le systeme source."
+      - name: last_movement
+        description: "Date du dernier mouvement de stock."
+      - name: reorder_level
+        description: "Seuil de stock declenchant un reapprovisionnement."
+      - name: is_negative_stock
+        description: "Indicateur signalant une quantite disponible negative."
+
+  - name: stg_orders
+    description: "Couche staging des commandes d'achat SAP/ERP."
+    columns:
+      - name: order_id
+        description: "Identifiant unique de la commande d'achat."
+        tests: [not_null, unique]
+      - name: supplier_id
+        description: "Fournisseur destinataire de la commande."
+        tests:
+          - relationships:
+              to: ref('stg_suppliers')
+              field: supplier_id
+      - name: material_id
+        description: "Materiau commande."
+        tests:
+          - relationships:
+              to: ref('stg_materials')
+              field: material_id
+      - name: quantity
+        description: "Quantite commandee."
+      - name: unit
+        description: "Unite de mesure de la commande."
+      - name: order_date
+        description: "Date d'emission de la commande."
+      - name: delivery_date
+        description: "Date de livraison prevue."
+      - name: status
+        description: "Etat de traitement de la commande."
+      - name: unit_price
+        description: "Prix unitaire negocie."
+      - name: total_amount
+        description: "Montant total de la commande."
+
+  - name: stg_production_events
+    description: "Couche staging des evenements de fabrication."
+    columns:
+      - name: production_event_id
+        description: "Identifiant unique du lot ou evenement de production."
+        tests: [not_null, unique]
+      - name: product_id
+        description: "Produit fabrique pendant l'evenement."
+        tests:
+          - relationships:
+              to: ref('stg_products')
+              field: product_id
+      - name: machine_id
+        description: "Machine ou ligne de fabrication utilisee."
+      - name: quantity_produced
+        description: "Nombre d'unites fabriquees."
+      - name: event_timestamp
+        description: "Date et heure de l'evenement de production."
+      - name: shift
+        description: "Equipe ou quart de travail."
+      - name: operator_id
+        description: "Identifiant de l'operateur responsable."
+      - name: status
+        description: "Resultat de production : PASSED, FAILED ou REWORK."
+
+  - name: stg_quality_inspections
+    description: "Couche staging des controles qualite associes a la production."
+    columns:
+      - name: inspection_id
+        description: "Identifiant unique du controle qualite."
+        tests: [not_null, unique]
+      - name: production_event_id
+        description: "Evenement de production controle."
+        tests:
+          - relationships:
+              to: ref('stg_production_events')
+              field: production_event_id
+      - name: inspection_date
+        description: "Date de realisation du controle."
+      - name: inspector_id
+        description: "Identifiant de l'inspecteur."
+      - name: test_type
+        description: "Nature du controle : VISUAL, DIMENSIONAL, ELECTRICAL ou FUNCTIONAL."
+      - name: defect_code
+        description: "Code du defaut observe, ou NO_DEFECT en l'absence de defaut."
+      - name: status
+        description: "Resultat du controle : PASSED ou FAILED."
+      - name: comments
+        description: "Commentaire libre associe a l'inspection."

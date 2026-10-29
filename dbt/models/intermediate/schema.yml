@@ -1,0 +1,54 @@
+version: 2
+
+models:
+  - name: int_product_components
+    description: "Jointure intermediaire entre produits, nomenclatures et materiaux. Une ligne represente un composant d'une BOM enrichi de ses caracteristiques et de son cout estime."
+    columns:
+      - name: bom_id
+        description: "Identifiant de la ligne de nomenclature source."
+      - name: product_id
+        description: "Identifiant du produit fini."
+      - name: product_name
+        description: "Nom du produit fini."
+      - name: product_family
+        description: "Famille industrielle du produit fini."
+      - name: component_id
+        description: "Identifiant du materiau composant."
+      - name: component_description
+        description: "Designation du composant."
+      - name: component_category
+        description: "Categorie industrielle du composant."
+      - name: quantity
+        description: "Quantite de composant requise par unite de produit."
+      - name: unit
+        description: "Unite de mesure de la quantite."
+      - name: component_unit_price
+        description: "Prix d'achat unitaire du materiau."
+      - name: component_total_cost
+        description: "Cout estime du composant dans une unite de produit : quantite BOM multipliee par prix unitaire."
+
+  - name: int_production_quality
+    description: "Jointure intermediaire entre les evenements de production et leurs inspections qualite. Une production peut apparaitre sans inspection ou avec plusieurs inspections."
+    columns:
+      - name: production_event_id
+        description: "Identifiant de l'evenement ou du lot de production."
+      - name: product_id
+        description: "Produit fabrique."
+      - name: machine_id
+        description: "Machine ayant fabrique le produit."
+      - name: quantity_produced
+        description: "Quantite produite pendant l'evenement."
+      - name: event_timestamp
+        description: "Horodatage de l'evenement de production."
+      - name: production_status
+        description: "Statut de production : PASSED, FAILED ou REWORK."
+      - name: inspection_id
+        description: "Identifiant du controle qualite, nul si aucune inspection n'existe."
+      - name: inspection_date
+        description: "Date de realisation de l'inspection."
+      - name: test_type
+        description: "Type de controle qualite realise."
+      - name: defect_code
+        description: "Defaut detecte ou NO_DEFECT."
+      - name: quality_status
+        description: "Resultat de l'inspection : PASSED ou FAILED."
