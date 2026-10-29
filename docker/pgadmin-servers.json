@@ -1,0 +1,12 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Industrial Data Platform",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "industrial_db",
+      "SSLMode": "prefer"
+    }
+  }
+}
