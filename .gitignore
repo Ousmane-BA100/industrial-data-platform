@@ -1,0 +1,51 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Project
+.env
+.env.local
+CV_Ousmane_BA_data_eng.pdf
+*.log
+logs/
+
+# Data (généré)
+data/sap/*.csv
+data/plm/*.csv
+data/production/*.csv
+data/quality/*.csv
+
+# Airflow
+airflow.db
+airflow/logs/
+
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/.user.yml
+
+# Testing
+.coverage
+.pytest_cache/
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db
