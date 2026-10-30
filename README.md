@@ -174,6 +174,77 @@ Quelques contrôles mis en place :
 
 FastAPI est exposee sur le port `8000` et lit uniquement les tables `public_marts`. Streamlit consomme cette API sur le port `8501`. Les mises a jour de donnees restent controlees par les sources, Airflow et dbt : l'API est volontairement en lecture seule.
 
+## 🖼️ Captures d'ecran
+
+### 📊 Dashboard Streamlit
+
+Vue d'ensemble des indicateurs de production, de conformite et de reapprovisionnement :
+
+![Dashboard Streamlit - vue d'ensemble](images-readme/Vue%20d%27ensemble%20-%20streamlit.png)
+
+<details>
+<summary>Voir les autres pages du dashboard</summary>
+
+#### ✅ Qualite
+
+![Dashboard Streamlit - qualite](images-readme/Qualite-%20streamlit.png)
+
+#### 📦 Stock
+
+![Dashboard Streamlit - stock](images-readme/Stock%20-%20streamlit.png)
+
+#### 💰 Produits et nomenclature BOM
+
+![Dashboard Streamlit - produit et BOM](images-readme/Produit-BOM%20-%20streamlit.png)
+
+</details>
+
+### 🐘 PostgreSQL et pgAdmin
+
+Les schémas RAW et dbt sont consultables dans pgAdmin. Les captures montrent les donnees sources, le cout de BOM et les principaux defauts :
+
+![Schemas PostgreSQL dans pgAdmin](images-readme/Pgadmin-4-shemas.png)
+
+<details>
+<summary>Voir des exemples de tables et de marts</summary>
+
+#### Table RAW des materiaux
+
+![Table public.materials](images-readme/public.materials.png)
+
+#### Cout theorique de nomenclature
+
+![Mart fact_product_bom_cost](images-readme/public_marts.fact_product_bom_cost.png)
+
+#### Indicateurs des defauts qualite
+
+![Mart kpi_top_defects](images-readme/public_marts.kpi_top_defects.png)
+
+</details>
+
+### 🛫 Airflow et 🔄 dbt Docs
+
+Airflow rend visibles les dependances et l'execution des taches. dbt Docs presente les modeles, les applications consommatrices et leur lineage :
+
+![DAG Airflow du pipeline industriel](images-readme/Airflow-im.png)
+
+<details>
+<summary>Voir la documentation et le lineage dbt</summary>
+
+#### Page d'accueil de la documentation dbt
+
+![Page d'accueil dbt Docs](images-readme/documentation-dbt.png)
+
+#### Graphe de lineage des donnees
+
+![Graphe de lineage dbt](images-readme/DAG-lineage-graph.png)
+
+#### Exposition Streamlit dans dbt Docs
+
+![Exposure Streamlit dans dbt Docs](images-readme/documentation-dbt-exposure.png)
+
+</details>
+
 ## 📁 Structure du projet
 
 ```text
